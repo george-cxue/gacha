@@ -14,10 +14,10 @@ RED = (255, 0, 0)
 GRAY = (128, 128, 128)
 
 # Sounds - need to update paths
-gunshot = pygame.mixer.Sound("/workspaces/gacha/sound effects/gunshot.wav")
-bruh = pygame.mixer.Sound("/workspaces/gacha/sound effects/bruh.wav")
-womp = pygame.mixer.Sound("/workspaces/gacha/sound effects/wompWomp.wav")
-click = pygame.mixer.Sound("/workspaces/gacha/sound effects/clickSound.wav")
+gunshot = pygame.mixer.Sound("sound effects/gunshot.wav")
+bruh = pygame.mixer.Sound("sound effects/bruh.wav")
+womp = pygame.mixer.Sound("sound effects/wompWomp.wav")
+click = pygame.mixer.Sound("sound effects/clickSound.wav")
 
 clock = pygame.time.Clock()
 
