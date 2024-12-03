@@ -4,6 +4,32 @@ import json
 import os
 from sprites import Pistol, TwoPumpGun, ShotgunGun, MinugunGun
 
+pygame.mixer.init() 
+click = pygame.mixer.Sound("assets/sound_effects/clickSound.wav")
+
+titleScreen = pygame.image.load('assets/images/titleScreen.jpg')
+test = pygame.image.load('assets/images/playButtonTransparent.png')
+test = pygame.transform.scale(test, (200, 70))
+
+lotteryButton = pygame.image.load('assets/images/lotteryButtonTransparent.png')
+lotteryButton = pygame.transform.scale(lotteryButton, (200, 70))
+
+quitButton = pygame.image.load('assets/images/quitButtonTransparent.png')
+quitButton = pygame.transform.scale(quitButton, (200, 70))
+
+lotteryScreen = pygame.image.load('assets/images/gunLotteryScreen.jpg')
+
+drawGunButton = pygame.image.load('assets/images/drawGunButton.png')
+drawGunButton = pygame.transform.scale(drawGunButton, (200, 70))
+
+homeButton = pygame.image.load('assets/images/homeButton.png')
+homeButton = pygame.transform.scale(homeButton, (200, 70))
+
+gameOverScreen = pygame.image.load('assets/images/gameOverScreen.jpg')
+
+replayButton = pygame.image.load('assets/images/replayButton.png')
+replayButton = pygame.transform.scale(replayButton, (200,70))
+
 def get_gun_from_name(gun_name):
     gun_map = {
         "TwoPumpGun": TwoPumpGun(),
@@ -51,41 +77,30 @@ def get_random_gun():
 
 def start_screen(screen, screen_width, screen_height, click_sound):
     total_money = load_game_data()['total_money']
-    title_font = pygame.font.Font(None, 72)
     button_font = pygame.font.Font(None, 48)
 
     # Define button rectangles
-    play_button_rect = pygame.Rect((screen_width // 2 - 100, screen_height // 2), (200, 50))
-    lottery_button_rect = pygame.Rect((screen_width // 2 - 100, screen_height // 2 + 100), (200, 50))
-    quit_button_rect = pygame.Rect((screen_width // 2 - 100, screen_height // 2 + 200), (200, 50))
-
-    title_surface = title_font.render("GACHA SHOOTER PEW PEW", True, (255, 255, 255))
-    play_button_surface = button_font.render("PLAY", True, (0, 0, 0))
-    lottery_button_surface = button_font.render("LOTTERY", True, (0, 0, 0))
-    quit_button_surface = button_font.render("QUIT", True, (0, 0, 0))
-    money_surface = button_font.render(f"Money: {total_money}", True, (255, 255, 255))
+    
+    lottery_button_rect = pygame.Rect((screen_width // 2 - 100, screen_height // 3 + 150), (200, 50))
+    quit_button_rect = pygame.Rect((screen_width // 2 - 100, screen_height // 3 + 250), (200, 50))
+    test_image_rect = pygame.Rect((screen_width // 2 - 100, screen_height // 3 + 50), (200, 50))
+    money_surface = button_font.render(f"Money: {total_money}", True, (0, 0, 0))
 
     running = True
     while running:
-        screen.fill((0, 0, 0))
-        screen.blit(title_surface, (screen_width // 2 - title_surface.get_width() // 2, screen_height // 2 - 200))
+        screen.blit(titleScreen, (0, 0))
         screen.blit(money_surface, (10, 10))
 
         # Draw buttons
-        pygame.draw.rect(screen, (128, 128, 128), play_button_rect)
-        screen.blit(play_button_surface, (play_button_rect.x + 70, play_button_rect.y + 10))
-
-        pygame.draw.rect(screen, (128, 128, 128), lottery_button_rect)
-        screen.blit(lottery_button_surface, (lottery_button_rect.x + 50, lottery_button_rect.y + 10))
-
-        pygame.draw.rect(screen, (128, 128, 128), quit_button_rect)
-        screen.blit(quit_button_surface, (quit_button_rect.x + 70, quit_button_rect.y + 10))
+        screen.blit(test, (test_image_rect.x, test_image_rect.y))
+        screen.blit(lotteryButton, (lottery_button_rect.x, lottery_button_rect.y))
+        screen.blit(quitButton, (quit_button_rect.x, quit_button_rect.y))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return 'quit'
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if play_button_rect.collidepoint(event.pos):
+                if test_image_rect.collidepoint(event.pos):  # Check if test image is clicked
                     click_sound.play()
                     return 'play'
                 elif lottery_button_rect.collidepoint(event.pos):
@@ -102,76 +117,76 @@ def death_screen(screen, screen_width, screen_height, score, money, total_money,
     total_money += money  # Add earned money to total
     save_game_data(total_money, current_gun)  # Save total money
 
-    title_font = pygame.font.Font(None, 72)
     button_font = pygame.font.Font(None, 48)
 
-    game_over_surface = title_font.render("GAME OVER", True, (255, 255, 255))
-    score_surface = button_font.render(f"Final Score: {score}", True, (255, 255, 255))
-    money_surface = button_font.render(f"Money Earned: {money}", True, (255, 255, 255))
-    total_money_surface = button_font.render(f"Total Money: {total_money}", True, (255, 255, 255))
+    score_surface = button_font.render(f"Final Score: {score}", True, (0, 0, 0))
+    money_surface = button_font.render(f"Money Earned: {money}", True, (0, 0, 0))
+    total_money_surface = button_font.render(f"Total Money: {total_money}", True, (0, 0, 0))
 
-    replay_button_rect = pygame.Rect((screen_width // 2 - 150, screen_height // 2 + 100), (300, 50))
-    home_button_rect = pygame.Rect((screen_width // 2 - 150, screen_height // 2 + 200), (300, 50))
+
+    replay_button_rect = pygame.Rect((screen_width // 2 - 100, screen_height // 2 + 100), (300, 50))
+    home_button_rect = pygame.Rect((screen_width // 2 - 100, screen_height // 2 + 200), (300, 50))
 
     replay_surface = button_font.render("REPLAY", True, (0, 0, 0))
     home_surface = button_font.render("HOME SCREEN", True, (0, 0, 0))
 
     running = True
     while running:
-        screen.fill((0, 0, 0))
-        screen.blit(game_over_surface, (screen_width // 2 - game_over_surface.get_width() // 2, screen_height // 2 - 200))
+        screen.blit(gameOverScreen, (0, 0))
         screen.blit(score_surface, (screen_width // 2 - score_surface.get_width() // 2, screen_height // 2 - 100))
         screen.blit(money_surface, (screen_width // 2 - money_surface.get_width() // 2, screen_height // 2 - 50))
         screen.blit(total_money_surface, (screen_width // 2 - total_money_surface.get_width() // 2, screen_height // 2))
 
-        pygame.draw.rect(screen, (128, 128, 128), replay_button_rect)
-        screen.blit(replay_surface, (replay_button_rect.x + 100, replay_button_rect.y + 10))
-
-        pygame.draw.rect(screen, (128, 128, 128), home_button_rect)
-        screen.blit(home_surface, (home_button_rect.x + 70, home_button_rect.y + 10))
+        #pygame.draw.rect(screen, (128, 128, 128), replay_button_rect)
+        #screen.blit(replay_surface, (replay_button_rect.x + 100, replay_button_rect.y + 10))
+        screen.blit(replayButton, (replay_button_rect.x, replay_button_rect.y))
+        screen.blit(homeButton, (home_button_rect.x, home_button_rect.y))
+        #pygame.draw.rect(screen, (128, 128, 128), home_button_rect)
+        #screen.blit(home_surface, (home_button_rect.x + 70, home_button_rect.y + 10))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                click.play()
                 return 'quit'
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if replay_button_rect.collidepoint(event.pos):
+                    click.play()
                     return 'play'
                 elif home_button_rect.collidepoint(event.pos):
+                    click.play()
                     return 'home'
 
         pygame.display.flip()
         pygame.time.Clock().tick(60)
 
 def lottery_screen(screen, screen_width, screen_height, total_money, current_gun):
-    title_font = pygame.font.Font(None, 72)
     button_font = pygame.font.Font(None, 48)
     text_font = pygame.font.Font(None, 36)
 
-    lottery_surface = title_font.render("GUN LOTTERY", True, (255, 255, 255))
+    
     money_surface = text_font.render(f"Total Money: {total_money}", True, (255, 255, 255))
     current_gun_surface = text_font.render(f"Current Gun: {current_gun.__class__.__name__}", True, (255, 255, 255))
 
     # Lottery draw button
-    draw_button_rect = pygame.Rect((screen_width // 2 - 150, screen_height // 2), (300, 50))
-    draw_surface = button_font.render("DRAW GUN (50 $)", True, (0, 0, 0))
-
-    home_button_rect = pygame.Rect((screen_width // 2 - 100, screen_height - 100), (200, 50))
-    home_surface = button_font.render("HOME", True, (0, 0, 0))
+    draw_button_rect = pygame.Rect((screen_width // 2 - 100, screen_height // 2), (200, 70))
+    home_button_rect = pygame.Rect((screen_width // 2 - 100, screen_height - 100), (200, 70))
 
     new_gun_surface = None
 
     running = True
     while running:
-        screen.fill((0, 0, 0))
-        screen.blit(lottery_surface, (screen_width // 2 - lottery_surface.get_width() // 2, screen_height // 2 - 250))
+        screen.blit(lotteryScreen, (0, 0))
         screen.blit(money_surface, (10, 10))
         screen.blit(current_gun_surface, (10, 50))
 
-        pygame.draw.rect(screen, (128, 128, 128), draw_button_rect)
-        screen.blit(draw_surface, (draw_button_rect.x + 20, draw_button_rect.y + 10))
+        #pygame.draw.rect(screen, (128, 128, 128), draw_button_rect)
+        #screen.blit(draw_surface, (draw_button_rect.x + 20, draw_button_rect.y + 10))
 
-        pygame.draw.rect(screen, (128, 128, 128), home_button_rect)
-        screen.blit(home_surface, (home_button_rect.x + 70, home_button_rect.y + 10))
+        screen.blit(drawGunButton, (draw_button_rect.x, draw_button_rect.y))
+        screen.blit(homeButton, (home_button_rect.x, home_button_rect.y))
+
+        #pygame.draw.rect(screen, (128, 128, 128), home_button_rect)
+        #screen.blit(home_surface, (home_button_rect.x + 70, home_button_rect.y + 10))
 
         # Display new gun if drawn
         if new_gun_surface:
@@ -179,16 +194,19 @@ def lottery_screen(screen, screen_width, screen_height, total_money, current_gun
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                click.play()
                 return total_money, current_gun, 'quit'
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if home_button_rect.collidepoint(event.pos):
+                    click.play()
                     return total_money, current_gun, 'home'
                 
                 if draw_button_rect.collidepoint(event.pos):
+                    click.play()
                     if total_money >= 50:
                         total_money -= 50
                         drawn_gun = get_random_gun()
-                        new_gun_surface = text_font.render(f"You drew: {drawn_gun.__class__.__name__}!", True, (255, 255, 255))
+                        new_gun_surface = text_font.render(f"You drew: {drawn_gun.__class__.__name__}!", True, (0, 0, 0))
                         current_gun = drawn_gun
                         save_game_data(total_money, current_gun)
 

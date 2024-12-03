@@ -4,13 +4,16 @@ import math
 
 ## Player and Enemies ##
 
+#pygame.image.load('image_file.png')
+
 class Player(pygame.sprite.Sprite):
     def __init__(self, screen_width, screen_height):
         super().__init__()
         self.screen_width = screen_width
         self.screen_height = screen_height
-        self.image = pygame.Surface((30, 30))
-        self.image.fill((255, 255, 255))
+        self.image = pygame.image.load('assets/images/transparentFinal.png')
+        self.image = pygame.transform.scale(self.image, (50, 90))
+        #self.image.fill((255, 255, 255))
         self.rect = self.image.get_rect()
         self.rect.center = (screen_width // 2, screen_height // 2)
         self.speed = 5
@@ -34,8 +37,8 @@ class Enemy(pygame.sprite.Sprite):
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.player = player
-        self.image = pygame.Surface((20, 20))
-        self.image.fill((255, 0, 0))
+        self.image = pygame.image.load('assets/images/owlTransparent.png')
+        self.image = pygame.transform.scale(self.image, (60, 60))
         self.rect = self.image.get_rect()
         self.rect.x = random.randint(0, screen_width - self.rect.width)
         self.rect.y = random.randint(0, screen_height - self.rect.height)
@@ -60,7 +63,7 @@ class Bullet(pygame.sprite.Sprite):
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.image = pygame.Surface((5, 5))
-        self.image.fill((255, 255, 255))
+        self.image.fill((0, 0, 0))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.speed = 10

@@ -17,6 +17,7 @@ pygame.init()
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+background_image = pygame.image.load('assets/images/background_streched_fighting.jpg')
 pygame.display.set_caption("GACHA SHOOTER PEW PEW")
 
 # Colors
@@ -30,6 +31,7 @@ gunshot = pygame.mixer.Sound("assets/sound_effects/gunshot.wav")
 bruh = pygame.mixer.Sound("assets/sound_effects/bruh.wav")
 womp = pygame.mixer.Sound("assets/sound_effects/wompWomp.wav")
 click = pygame.mixer.Sound("assets/sound_effects/clickSound.wav")
+pygame.mixer.music.load("assets/sound_effects/myEyes.mp3")
 
 clock = pygame.time.Clock()
 
@@ -52,6 +54,7 @@ def main_game(total_money, current_gun):
                 return total_money, current_gun, 'quit'
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # Left click
+                    gunshot.play()
                     mouse_x, mouse_y = pygame.mouse.get_pos()
                     direction = pygame.math.Vector2(mouse_x - player.rect.centerx, mouse_y - player.rect.centery)
                     if direction.length() > 0:
@@ -59,6 +62,7 @@ def main_game(total_money, current_gun):
                     
                     # Use the current gun's shoot method
                     current_gun.shoot(
+                        
                         player.rect.centerx, 
                         player.rect.centery, 
                         direction, 
@@ -91,8 +95,9 @@ def main_game(total_money, current_gun):
             money += 1
 
         # Render
-        screen.fill(BLACK)
+        screen.blit(background_image, (0, 0))
         all_sprites.draw(screen)
+        
 
         # Display health, score, and money
         font = pygame.font.Font(None, 36)
@@ -103,7 +108,7 @@ def main_game(total_money, current_gun):
         screen.blit(score_money_surface, (SCREEN_WIDTH - 250, 10))
 
         gun_surface = font.render(f"Gun: {current_gun.__class__.__name__}", True, WHITE)
-        screen.blit(gun_surface, (SCREEN_WIDTH - 250, 50))
+        screen.blit(gun_surface, (SCREEN_WIDTH - 240, 40))
 
         pygame.display.flip()
         clock.tick(60)
@@ -121,25 +126,32 @@ def main():
         start_action = start_screen(screen, SCREEN_WIDTH, SCREEN_HEIGHT, click)
         
         if start_action == 'quit':
+            pygame.mixer.music.stop()
             break
         elif start_action == 'play':
             # Main Game
+            pygame.mixer.music.play()
             total_money, current_gun, result = main_game(total_money, current_gun)
             save_game_data(total_money, current_gun)
             
             if result == 'quit':
+                pygame.mixer.music.stop()
                 break
             elif result == 'death':
                 # Death Screen
+                pygame.mixer.music.stop()
                 death_action = death_screen(screen, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, total_money, current_gun)
                 
                 if death_action == 'quit':
+                    pygame.mixer.music.stop()
                     break
                 elif death_action == 'home':
+                    pygame.mixer.music.stop()
                     continue
         
         elif start_action == 'lottery':
             # Lottery Screen
+            pygame.mixer.music.stop()
             total_money, current_gun, lottery_action = lottery_screen(screen, SCREEN_WIDTH, SCREEN_HEIGHT, total_money, current_gun)
             save_game_data(total_money, current_gun)
             
