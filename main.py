@@ -1,13 +1,13 @@
 import pygame
 import random
 import sys
-from sprites import Player, Bullet, Enemy
+from sprites import MinugunGun, Player, Bullet, Enemy
 from screens import (
-    start_screen, 
-    death_screen, 
-    lottery_screen, 
-    load_game_data, 
-    save_game_data
+    start_screen,
+    death_screen,
+    lottery_screen,
+    load_game_data,
+    save_game_data,
 )
 
 # Initialization
@@ -17,7 +17,7 @@ pygame.init()
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-background_image = pygame.image.load('assets/images/background_streched_fighting.jpg')
+background_image = pygame.image.load("assets/images/background_streched_fighting.jpg")
 pygame.display.set_caption("GACHA SHOOTER PEW PEW")
 
 # Colors
@@ -35,6 +35,7 @@ pygame.mixer.music.load("assets/sound_effects/myEyes.mp3")
 
 clock = pygame.time.Clock()
 
+
 def main_game(total_money, current_gun):
     all_sprites = pygame.sprite.Group()
     bullets = pygame.sprite.Group()
@@ -50,28 +51,54 @@ def main_game(total_money, current_gun):
     while game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                save_game_data(total_money + money, current_gun)
-                return total_money, current_gun, 'quit'
+                save_game_data(total_money, current_gun)
+                return total_money, current_gun, "quit", score, money
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:  # Left click
-                    gunshot.play()
+                if event.button == 1 and not isinstance(
+                    current_gun, MinugunGun
+                ):  # Left click for non-minigun weapons
                     mouse_x, mouse_y = pygame.mouse.get_pos()
-                    direction = pygame.math.Vector2(mouse_x - player.rect.centerx, mouse_y - player.rect.centery)
+                    direction = pygame.math.Vector2(
+                        mouse_x - player.rect.centerx, mouse_y - player.rect.centery
+                    )
                     if direction.length() > 0:
                         direction = direction.normalize()
-                    
+
                     # Use the current gun's shoot method
                     current_gun.shoot(
-                        
-                        player.rect.centerx, 
-                        player.rect.centery, 
-                        direction, 
-                        SCREEN_WIDTH, 
-                        SCREEN_HEIGHT, 
-                        gunshot, 
-                        bullets, 
-                        all_sprites
+                        player.rect.centerx,
+                        player.rect.centery,
+                        direction,
+                        SCREEN_WIDTH,
+                        SCREEN_HEIGHT,
+                        gunshot,
+                        bullets,
+                        all_sprites,
                     )
+
+        # Check for held mouse button only for MinugunGun
+        mouse_buttons = pygame.mouse.get_pressed()
+        if mouse_buttons[0] and isinstance(
+            current_gun, MinugunGun
+        ):  # Left mouse button for minigun
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            direction = pygame.math.Vector2(
+                mouse_x - player.rect.centerx, mouse_y - player.rect.centery
+            )
+            if direction.length() > 0:
+                direction = direction.normalize()
+
+            # Use the minigun's shoot method
+            current_gun.shoot(
+                player.rect.centerx,
+                player.rect.centery,
+                direction,
+                SCREEN_WIDTH,
+                SCREEN_HEIGHT,
+                gunshot,
+                bullets,
+                all_sprites,
+            )
 
         # Spawn enemies
         if len(enemies) < 5 and random.random() < 0.02:
@@ -97,14 +124,15 @@ def main_game(total_money, current_gun):
         # Render
         screen.blit(background_image, (0, 0))
         all_sprites.draw(screen)
-        
 
         # Display health, score, and money
         font = pygame.font.Font(None, 36)
         health_surface = font.render(f"Health: {player.health}", True, WHITE)
         screen.blit(health_surface, (10, 10))
 
-        score_money_surface = font.render(f"Score: {score}  Money: {money}", True, WHITE)
+        score_money_surface = font.render(
+            f"Score: {score}  Money: {money}", True, WHITE
+        )
         screen.blit(score_money_surface, (SCREEN_WIDTH - 250, 10))
 
         gun_surface = font.render(f"Gun: {current_gun.__class__.__name__}", True, WHITE)
@@ -113,56 +141,71 @@ def main_game(total_money, current_gun):
         pygame.display.flip()
         clock.tick(60)
 
-    return total_money + money, current_gun, 'death'
+    return total_money, current_gun, "death", score, money
+
 
 def main():
     # Load game data
     game_data = load_game_data()
-    total_money = game_data['total_money']
-    current_gun = game_data['current_gun']
-    
+    total_money = game_data["total_money"]
+    current_gun = game_data["current_gun"]
+
     while True:
         # Start Screen
         start_action = start_screen(screen, SCREEN_WIDTH, SCREEN_HEIGHT, click)
-        
-        if start_action == 'quit':
+
+        if start_action == "quit":
             pygame.mixer.music.stop()
             break
-        elif start_action == 'play':
+        elif start_action == "play":
             # Main Game
             pygame.mixer.music.play()
-            total_money, current_gun, result = main_game(total_money, current_gun)
+            game_total, current_gun, result, score, session_money = main_game(
+                total_money, current_gun
+            )
+            total_money += session_money
             save_game_data(total_money, current_gun)
-            
-            if result == 'quit':
+
+            if result == "quit":
                 pygame.mixer.music.stop()
                 break
-            elif result == 'death':
+            elif result == "death":
                 # Death Screen
                 pygame.mixer.music.stop()
-                death_action = death_screen(screen, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, total_money, current_gun)
-                
-                if death_action == 'quit':
+                death_action = death_screen(
+                    screen,
+                    SCREEN_WIDTH,
+                    SCREEN_HEIGHT,
+                    score,
+                    session_money,
+                    total_money,
+                    current_gun,
+                )
+
+                if death_action == "quit":
                     pygame.mixer.music.stop()
                     break
-                elif death_action == 'home':
+                elif death_action == "home":
                     pygame.mixer.music.stop()
                     continue
-        
-        elif start_action == 'lottery':
+
+        elif start_action == "lottery":
             # Lottery Screen
             pygame.mixer.music.stop()
-            total_money, current_gun, lottery_action = lottery_screen(screen, SCREEN_WIDTH, SCREEN_HEIGHT, total_money, current_gun)
+            total_money, current_gun, lottery_action = lottery_screen(
+                screen, SCREEN_WIDTH, SCREEN_HEIGHT, total_money, current_gun
+            )
             save_game_data(total_money, current_gun)
-            
-            if lottery_action == 'quit':
+
+            if lottery_action == "quit":
                 break
-            elif lottery_action == 'home':
+            elif lottery_action == "home":
                 continue
 
     # Cleanup
     pygame.quit()
     sys.exit()
+
 
 if __name__ == "__main__":
     main()
