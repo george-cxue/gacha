@@ -107,7 +107,7 @@ class Pistol:
         bullets_group.add(bullet)
 
 
-class TwoPumpGun:
+class TwoPump:
     def shoot(
         self,
         x,
@@ -122,9 +122,6 @@ class TwoPumpGun:
         spread_angle = 15  # degrees
         rotation_matrix_positive = pygame.math.Vector2(
             math.cos(math.radians(spread_angle)), math.sin(math.radians(spread_angle))
-        )
-        rotation_matrix_negative = pygame.math.Vector2(
-            math.cos(math.radians(-spread_angle)), math.sin(math.radians(-spread_angle))
         )
 
         bullet1_direction = direction
@@ -146,7 +143,7 @@ class TwoPumpGun:
         bullets_group.add(bullet1, bullet2)
 
 
-class ShotgunGun:
+class Shotgun:
     def shoot(
         self,
         x,
@@ -176,10 +173,10 @@ class ShotgunGun:
             bullets_group.add(bullet)
 
 
-class MinugunGun:
+class Minigun:
     def __init__(self):
         self.last_shot_time = 0
-        self.shot_cooldown = 100  # Milliseconds between shots
+        self.shot_cooldown = 100
 
     def shoot(
         self,

@@ -1,7 +1,7 @@
 import pygame
 import random
 import sys
-from sprites import MinugunGun, Player, Bullet, Enemy
+from sprites import Minigun, Player, Bullet, Enemy
 from screens import (
     start_screen,
     death_screen,
@@ -55,7 +55,7 @@ def main_game(total_money, current_gun):
                 return total_money, current_gun, "quit", score, money
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1 and not isinstance(
-                    current_gun, MinugunGun
+                    current_gun, Minigun
                 ):  # Left click for non-minigun weapons
                     mouse_x, mouse_y = pygame.mouse.get_pos()
                     direction = pygame.math.Vector2(
@@ -76,11 +76,9 @@ def main_game(total_money, current_gun):
                         all_sprites,
                     )
 
-        # Check for held mouse button only for MinugunGun
+        # Check for held mouse button (only Minigun)
         mouse_buttons = pygame.mouse.get_pressed()
-        if mouse_buttons[0] and isinstance(
-            current_gun, MinugunGun
-        ):  # Left mouse button for minigun
+        if mouse_buttons[0] and isinstance(current_gun, Minigun):
             mouse_x, mouse_y = pygame.mouse.get_pos()
             direction = pygame.math.Vector2(
                 mouse_x - player.rect.centerx, mouse_y - player.rect.centery
@@ -88,7 +86,6 @@ def main_game(total_money, current_gun):
             if direction.length() > 0:
                 direction = direction.normalize()
 
-            # Use the minigun's shoot method
             current_gun.shoot(
                 player.rect.centerx,
                 player.rect.centery,

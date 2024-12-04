@@ -2,7 +2,7 @@ import pygame
 import random
 import json
 import os
-from sprites import Pistol, TwoPumpGun, ShotgunGun, MinugunGun
+from sprites import Pistol, TwoPump, Shotgun, Minigun
 
 pygame.mixer.init()
 click = pygame.mixer.Sound("assets/sound_effects/clickSound.wav")
@@ -33,9 +33,9 @@ replayButton = pygame.transform.scale(replayButton, (200, 70))
 
 def get_gun_from_name(gun_name):
     gun_map = {
-        "TwoPumpGun": TwoPumpGun(),
-        "ShotgunGun": ShotgunGun(),
-        "MinugunGun": MinugunGun(),
+        "TwoPump": TwoPump(),
+        "Shotgun": Shotgun(),
+        "Minigun": Minigun(),
     }
     return gun_map.get(gun_name, Pistol())
 
@@ -46,9 +46,9 @@ def load_game_data():
             data = json.load(f)
             return {
                 "total_money": data.get("total_money", 0),
-                "current_gun": get_gun_from_name(data.get("current_gun", "TwoPumpGun")),
+                "current_gun": get_gun_from_name(data.get("current_gun", "TwoPump")),
             }
-    return {"total_money": 0, "current_gun": TwoPumpGun()}
+    return {"total_money": 0, "current_gun": TwoPump()}
 
 
 def save_game_data(total_money, current_gun):
@@ -61,9 +61,9 @@ def save_game_data(total_money, current_gun):
 
 def get_random_gun():
     guns = [
-        {"type": TwoPumpGun(), "probability": 0.7},
-        {"type": ShotgunGun(), "probability": 0.2},
-        {"type": MinugunGun(), "probability": 0.1},
+        {"type": TwoPump(), "probability": 0.7},
+        {"type": Shotgun(), "probability": 0.2},
+        {"type": Minigun(), "probability": 0.1},
     ]
 
     random_val = random.random()
@@ -108,9 +108,7 @@ def start_screen(screen, screen_width, screen_height, click_sound):
             if event.type == pygame.QUIT:
                 return "quit"
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if test_image_rect.collidepoint(
-                    event.pos
-                ):  # Check if test image is clicked
+                if test_image_rect.collidepoint(event.pos):
                     click_sound.play()
                     return "play"
                 elif lottery_button_rect.collidepoint(event.pos):
@@ -127,8 +125,8 @@ def start_screen(screen, screen_width, screen_height, click_sound):
 def death_screen(
     screen, screen_width, screen_height, score, money, total_money, current_gun
 ):
-    total_money += money  # Add earned money to total
-    save_game_data(total_money, current_gun)  # Save total money
+    total_money += money
+    save_game_data(total_money, current_gun)
 
     button_font = pygame.font.Font(None, 48)
 
@@ -145,8 +143,8 @@ def death_screen(
         (screen_width // 2 - 100, screen_height // 2 + 200), (300, 50)
     )
 
-    replay_surface = button_font.render("REPLAY", True, (0, 0, 0))
-    home_surface = button_font.render("HOME SCREEN", True, (0, 0, 0))
+    # replay_surface = button_font.render("REPLAY", True, (0, 0, 0))
+    # home_surface = button_font.render("HOME SCREEN", True, (0, 0, 0))
 
     running = True
     while running:
@@ -197,7 +195,6 @@ def death_screen(
 
 
 def lottery_screen(screen, screen_width, screen_height, total_money, current_gun):
-    button_font = pygame.font.Font(None, 48)
     text_font = pygame.font.Font(None, 36)
 
     money_surface = text_font.render(
@@ -207,7 +204,6 @@ def lottery_screen(screen, screen_width, screen_height, total_money, current_gun
         f"Current Gun: {current_gun.__class__.__name__}", True, (255, 255, 255)
     )
 
-    # Lottery draw button
     draw_button_rect = pygame.Rect(
         (screen_width // 2 - 100, screen_height // 2), (200, 70)
     )
@@ -220,7 +216,6 @@ def lottery_screen(screen, screen_width, screen_height, total_money, current_gun
     running = True
     while running:
         screen.blit(lotteryScreen, (0, 0))
-        # Update money display every frame
         money_surface = text_font.render(
             f"Total Money: {total_money}", True, (255, 255, 255)
         )
